@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour, IKitchenObjectParent
 {
-    public static Player Instance { get; private set;  }
+    public static Player Instance { get; private set; }
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
     public class OnSelectedCounterChangedEventArgs : EventArgs
     {
@@ -15,7 +15,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     [SerializeField] private GameInput gameInput;
     [SerializeField] private LayerMask countersLayerMask;
     [SerializeField] private Transform kitchenObjectHoldPoint;
-    private KitchenObject  kitchenObject;
+    private KitchenObject kitchenObject;
     private bool isWalking;
     private Vector3 lastInteractDir;
     private BaseCounter selectedCounter;
@@ -23,8 +23,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     {
         return isWalking;
     }
-    private void Awake() {
-        if (Instance != null) { 
+    private void Awake()
+    {
+        if (Instance != null)
+        {
             Debug.LogError("There is more than one Player instance");
         }
         Instance = this;
@@ -76,29 +78,32 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         float playerRadius = .7f;
         float playerHeight = 2f;
         bool canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDir, moveDistance);
-        isWalking = moveDir != Vector3.zero;
         if (!canMove)
         {
             // Attempt only x movement
-            Vector3 moveDirectionX = new Vector3(moveDir.x, 0, 0).normalized;
-            canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirectionX, moveDistance);
+            Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized;
+            canMove = (moveDir.x < -.5f || moveDir.x > +.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirX, moveDistance);
 
             if (canMove)
             {
-                moveDir = moveDirectionX;
+                moveDir = moveDirX;
             }
             else
             {
-                Vector3 moveDirectionZ = new Vector3(0, 0, moveDir.z).normalized;
-                canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirectionZ, moveDistance);
+                Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized;
+                canMove = (moveDir.z < -.5f || moveDir.z > +.5f) && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * playerHeight, playerRadius, moveDirZ, moveDistance);
 
                 if (canMove)
                 {
-                    moveDir = moveDirectionZ;
+                    moveDir = moveDirZ;
+                }
+                else
+                {
+                    moveDir = Vector3.zero;
                 }
             }
         }
-
+        isWalking = moveDir != Vector3.zero;
         float rotateSpeed = 10;
         transform.position += moveDir * moveDistance;
 

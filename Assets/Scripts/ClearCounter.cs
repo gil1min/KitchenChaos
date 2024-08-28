@@ -4,18 +4,33 @@ using UnityEngine;
 
 public class ClearCounter : BaseCounter, IKitchenObjectParent
 {
-    [SerializeField] private KitchenObjectSO kitchenObjectSO; 
+    [SerializeField] private KitchenObjectSO kitchenObjectSO;
     public override void Interact(Player player)
     {
-        if (kitchenObject == null)
+        if (!HasKitchenObject())
+        // There is not kitchenObject here.
         {
-            Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.prefab, counterTopPoint);
-            kitchenObjectTransform.GetComponent<KitchenObject>().SetKitchenObjectParent(this);
+            if (player.HasKitchenObject())
+            {
+                player.GetKitchenObject().SetKitchenObjectParent(this);
+            }
+            else
+            {
+
+            }
         }
+        // There is a kitchenObject here.
         else
         {
-            // Give the object to the player.
-            kitchenObject.SetKitchenObjectParent(player);
+            if (player.HasKitchenObject())
+            {
+
+            }
+            else
+            // Player is not carrying anything.
+            {
+                kitchenObject.SetKitchenObjectParent(player);
+            }
         }
     }
 }
